@@ -14,65 +14,85 @@
 //Выводим результат
 // 2 - 3 -5 = -6
 
-let action = prompt('Enter action');
-let result;
-let showResult = '';
+const action = getAction();
+const operandsNumber = getOperandsNumber(); 
+const resultExpression = getExpression(operandsNumber, action);
+showResult(resultExpression);
 
-while(isSignValid(action)) {
-    action = prompt(`Enter action`);
+function getAction() {
+    let action = prompt('Please enter the action');
+
+    while (isActionInvalid(action)) {
+        action = prompt('Please enter the action');
+    }
+
+    return action;
 }
 
-let amountOfNumbers = prompt(`Enter the amount of numbers`);
-
-while(isNumberInvalid(amountOfNumbers) || amountOfNumbers < 2) {
-    amountOfNumbers = prompt(`Enter the amount of numbers`);
+function isActionInvalid(action) {
+    return action !== '+' && action !== '-' && action !== '*' && action !== '/';
 }
 
-for(var i = 0; i < amountOfNumbers; i++) {
-    let number = prompt(`Enter ${i} only numbers`);
+function getOperandsNumber() {
+    return getNumber('Please enter the number of operands', isOperandsNumberInvalid);
 }
 
-while(isNumberInvalid(number)) {
-    number = prompt(`Enter ${i} only numbers`);
+function isOperandsNumberInvalid(num) {
+    return isNumberInvalid(num) || num < 2;
 }
 
-number = +number;
-
-switch(i) {
-    case 0: 
-    result = number;
-    showResult += `${number}`;
-    break;
-    default: showResult += ` ${action} ${number}`;
+function getOperand(title) {
+    return getNumber(title, isOperandInvalid);
 }
 
-actionCalc(number);
-
-switch(i) {
-    case amountOfNumbers - 1:
-    showResult += ` = ${result}`;
+function isOperandInvalid(operand) {
+    return isNumberInvalid(operand);
 }
 
-console.log(showResult);
+function getNumber(title, validationFn) {
+    let operand = prompt(title);
+
+    while (validationFn(operand)) {
+        operand = prompt(title);
+    }
+
+    return +operand;
+}
 
 function isNumberInvalid(val) {
-    return val === null || val.trim() === "" || isNaN(val) || val <= 0;
+    return val === null || val.trim() === '' || isNaN(val);
 }
 
-function isSignValid(act) {
-    return act !== "+" && act !== "-" && act !== "/" && act !== "*";
-}
+function getExpression(count, operation) {
+    let result = getOperand('Operand 1');
+    let expression = result;
 
-function actionCalc(number){
-    switch(true){
-        case (i > 0): switch(action){
-            case "+": result += number;
-            break;
-            case "-": result -= number;
-            break;
-            case "*": result *= number;
-            break;
-            default: result /= number;
-        }
+    for (let i = 2; i <= count; i++) {
+        const operand = getOperand('Operand ' + i);
+
+        result = calculate(result, operand, operation);
+        expression += ` ${operation} ${operand}`;
     }
+
+    // 2 + 3 + = 5
+    return `${expression} = ${result}`;
+}
+
+function calculate(a, b, action) {
+    switch (action) {
+        case '+':
+            return a + b;
+        case '-':
+            return a - b;
+        case '*':
+            return a * b;
+        case '/':
+            return a / b;
+        default:
+            alert('Something went wrong');
+    }
+}
+
+function showResult(expression) {
+    alert(expression);
 }
